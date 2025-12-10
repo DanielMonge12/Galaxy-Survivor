@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Galaxy Survivor</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="ui">
+    <h1 id="title">Galaxy Survivor</h1>
+    <div id="instructions">Mover: ← → / A D • Disparar: (auto) • Pausa: P</div>
+    <div id="controls">
+      <button id="startBtn">Start</button>
+      <button id="resumeBtn" style="display:none;">Resume</button>
+      <button id="resetBtn" style="display:none;">Reset</button>
+    </div>
+    <div id="meta">
+      <div id="status">Vidas: 3</div>
+      <div id="score">Score: 0</div>
+      <div id="level">Nivel: 1</div>
+    </div>
+  </div>
+
+  <canvas id="gameCanvas" width="480" height="640"></canvas>
+
+  <script src="game.js"></script>
+</body>
+</html>

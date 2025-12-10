@@ -1,0 +1,51 @@
+:root{
+  --bg:#07071a;
+  --panel:#0f1724;
+  --accent:#4cc9f0;
+  --danger:#ef233c;
+  --muted:#9aa4b2;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+html,body{
+  height:100%;
+  margin:0;
+  background: linear-gradient(180deg,var(--bg),#021124);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+#ui{
+  position:absolute;
+  top:18px;
+  left:18px;
+  color:white;
+  z-index:10;
+}
+
+#title{ margin:0 0 6px 0; font-size:20px; color:var(--accent); }
+#instructions{ font-size:12px; color:var(--muted); margin-bottom:6px; }
+#controls button{
+  margin-right:6px;
+  padding:8px 12px;
+  border-radius:8px;
+  border:none;
+  background:#1b2a3a;
+  color:white;
+  cursor:pointer;
+  font-weight:600;
+}
+#meta{ margin-top:8px; display:flex; gap:12px; font-weight:700; color:#fff; }
+#gameCanvas{
+  box-shadow: 0 8px 30px rgba(2,6,23,0.7);
+  border-radius:8px;
+  border: 3px solid rgba(255,255,255,0.06);
+}
+#status, #score, #level{ font-size:14px; padding:4px 6px; background:rgba(255,255,255,0.02); border-radius:6px; }
+#controls button:hover{ transform:translateY(-2px); }
+@media (max-width:520px){
+  #gameCanvas{ width: 92vw; height: calc(92vw * (640/480)); }
+  #ui{ left:10px; top:8px; }
+  #title{ font-size:16px; }
+}
