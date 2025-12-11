@@ -16,6 +16,14 @@ html,body{
   justify-content:center;
 }
 
+#credits {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 14px;
+  color: #fff;
+  font-family: Arial, sans-serif;
+}
+
 #ui{
   position:absolute;
   top:18px;
