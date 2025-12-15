@@ -32,6 +32,11 @@ const titleEl = document.getElementById('title');
 const W = canvas.width;
 const H = canvas.height;
 
+// ===== IMAGEN JUGADOR =====
+const playerImg = new Image();
+playerImg.src = "navesita.png";
+
+
 // ===== GAME STATE =====
 let state = 'menu'; // menu, running, paused, gameover
 let lastTime = 0;
@@ -56,10 +61,10 @@ function initEntities(){
   player = {
     x: W/2 - 20,
     y: H - 80,
-    w: 40,
-    h: 40,
+    w: 50,
+    h: 50,
     speed: 5,
-    color: '#4cc9f0',
+    color: '#f07b4cff',
     rapid: false,
     rapidEnd: 0
   };
@@ -138,12 +143,8 @@ function update(dt){
   if(keys['ArrowRight'] || keys['d'] || keys['D']) player.x += player.speed;
   player.x = clamp(player.x, 6, W - player.w - 6);
 
-// ===== NAVESITA att ismael =====
-const playerImg = new Image();
-playerImg.src = "navesita.jpg";
 
-
-  // Diusparo automatico
+  // Disparo automatico
   shootTimer += dt;
   const currentShootInterval = player.rapid ? Math.max(120, shootInterval/2) : shootInterval;
   if(shootTimer > currentShootInterval){
@@ -341,11 +342,31 @@ function draw(){
     ctx.fillRect((i*73)%W, (i*131 + (performance.now()*0.01*(i%3)))%H, (i%3?1:2), (i%7?1:2));
   }
 
-  // player
-  ctx.fillStyle = player.color;
-  roundRect(ctx, player.x, player.y, player.w, player.h, 6, true, false);
-  ctx.fillStyle = '#012';
-  ctx.fillRect(player.x + 10, player.y + 10, player.w - 20, player.h - 18);
+// playerimagen ismael
+// player (imagen con rotación)
+let angle = 0;
+
+// inclina si se mueve
+if (keys['ArrowLeft'] || keys['a'] || keys['A']) angle = -0.25;
+if (keys['ArrowRight'] || keys['d'] || keys['D']) angle = 0.25;
+
+ctx.save();
+ctx.translate(
+  player.x + player.w / 2,
+  player.y + player.h / 2
+);
+ctx.rotate(angle);
+ctx.drawImage(
+  playerImg,
+  -player.w / 2,
+  -player.h / 2,
+  player.w,
+  player.h
+);
+ctx.restore();
+
+
+
 
   // bullets
   ctx.fillStyle = '#fff';
