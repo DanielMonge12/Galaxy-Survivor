@@ -138,7 +138,12 @@ function update(dt){
   if(keys['ArrowRight'] || keys['d'] || keys['D']) player.x += player.speed;
   player.x = clamp(player.x, 6, W - player.w - 6);
 
-  // shooting by timer (auto-shoot)
+// ===== NAVESITA att ismael =====
+const playerImg = new Image();
+playerImg.src = "navesita.jpg";
+
+
+  // Diusparo automatico
   shootTimer += dt;
   const currentShootInterval = player.rapid ? Math.max(120, shootInterval/2) : shootInterval;
   if(shootTimer > currentShootInterval){
