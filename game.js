@@ -12,7 +12,7 @@ function playSound(src, vol = 1) {
   s.play().catch(()=>{});
 }
 
-// nombres de archivos que tienes en la carpeta
+// Nombres de Los sonidos att: Ismael Quijada
 const sShoot = "mixkit-short-laser-gun-shot-1670.wav";
 const sExplosion = "explosion-6055.mp3";
 const sGameOver = "fail-144746.mp3";
@@ -109,7 +109,7 @@ function spawnBoss(){
   bossBullets = [];
 }
 
-// ===== SHOOTING =====
+// SONIDO AL DISPARAR LA NAVESITA att isma
 function shoot(){
   const bx = player.x + player.w/2 - 4;
   const by = player.y - 12;
@@ -117,7 +117,7 @@ function shoot(){
   playSound(sShoot, 0.9);
 }
 
-// ===== BOSS BULLETS =====
+// ===== BOSS BULLETS ===== att isma 
 function bossCreateBullet(){
   if(!boss) return;
   bossBullets.push({
@@ -129,7 +129,7 @@ function bossCreateBullet(){
   });
 }
 
-// ===== UPDATERS =====
+// ===== PERKS/MEJORAS att isma =====
 function update(dt){
   if(state !== 'running') return;
 
