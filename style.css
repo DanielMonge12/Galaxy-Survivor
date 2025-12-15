@@ -57,3 +57,18 @@ html,body{
   #ui{ left:10px; top:8px; }
   #title{ font-size:16px; }
 }
+
+#credits{
+  margin-top: 16px;        /* separa del canvas */
+  text-align: center;      /* centra el texto */
+  color: var(--muted);
+  font-size: 12px;
+  
+  /* moverlo ligeramente a la derecha */
+  position: relative;
+  left: 150px;
+}
+
+#credits p{
+  margin: 2px 0;
+}
