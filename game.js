@@ -66,7 +66,9 @@ function initEntities(){
     speed: 5,
     color: '#f07b4cff',
     rapid: false,
-    rapidEnd: 0
+    rapidEnd: 0,
+    invincible: false,
+  invincibleEnd: 0
   };
   bullets = [];
   enemies = [];
@@ -236,7 +238,7 @@ function update(dt){
     }
   }
 
-  // enemies vs player
+  // eenemigos vs jugadores
   for(let i = enemies.length -1; i >= 0; i--){
     const e = enemies[i];
     if(rectsCollide(e, player)){
