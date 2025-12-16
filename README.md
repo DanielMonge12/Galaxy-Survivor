@@ -66,32 +66,6 @@ El proyecto puede almacenarse y distribuirse como:
 
 ---
 
-## 🎥 Evidencia en video (individual)
-
-Cada integrante grabó un **video corto** donde:
-
-* Se ve su rostro o iniciales
-* Juega una partida de Galaxy Survivor
-* Explica brevemente su participación en el proyecto
-
-**Formato sugerido:**
-
-* Duración: 1–2 minutos
-* Grabación de pantalla con cámara o sesión remota
-
----
-
-## 🧑‍💻 Video general del equipo
-
-Video grupal donde:
-
-* Se muestra el videojuego funcionando
-* Aparecen los **créditos dentro del juego**
-* Se incluyen los nombres de los integrantes
-
-📌 Los créditos se muestran en la sección de **Créditos** del videojuego.
-
----
 
 ## 🏷️ Release final
 
