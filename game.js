@@ -53,6 +53,11 @@ let lives = 3;
 let player, bullets, enemies, powerups, boss;
 let bossSpawnedAt = 0; // último score en que apareció o se descartó boss
 let bossBullets = [];
+// ===== DIFICULTAD PROGRESIVA DEL BOSS =====
+let bossLevel = 1;          // cuántas veces ha salido el boss
+const bossBaseHP = 18;      // vida base
+const bossHpIncrease = 10;  // vida extra por nivel
+
 let keys = {};
 let musicStarted = false;
 
@@ -110,11 +115,27 @@ function spawnPowerup(){
 }
 
 function spawnBoss(){
-  // boss aparece con menos vida (ajustado), se inicializa shoot timer
   bossSpawnedAt = Math.floor(score);
-  boss = { x: W/2 - 60, y: -140, size: 110, speed: 1.2, hp: 18, dir: 1, shootTimer: 0, shootInterval: 900 };
+
+  boss = {
+    x: W/2 - 60,
+    y: -140,
+    size: 110,
+    speed: 1.2,
+    dir: 1,
+
+    // 👇 VIDA PROGRESIVA
+    hp: bossBaseHP + (bossLevel - 1) * bossHpIncrease,
+
+    shootTimer: 0,
+
+    // 👇 DISPARA MÁS RÁPIDO CADA VEZ
+    shootInterval: Math.max(400, 900 - bossLevel * 80)
+  };
+
   bossBullets = [];
 }
+
 
 // SONIDO AL DISPARAR LA NAVESITA att isma
 function shoot(){
@@ -227,12 +248,15 @@ function update(dt){
         bullets.splice(bi,1);
         boss.hp--;
         playSound(sExplosion, 0.9);
-        if(boss.hp <= 0){
-          // boss defeated
-          boss = null;
-          bossSpawnedAt = Math.floor(score);
-          score += 500;
-        }
+       if(boss.hp <= 0){
+  boss = null;
+  bossSpawnedAt = Math.floor(score);
+  score += 500;
+
+  // dificultad progresiva
+  bossLevel++;
+}
+
         break;
       }
     }
