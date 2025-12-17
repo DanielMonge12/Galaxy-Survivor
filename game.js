@@ -73,7 +73,11 @@ function initEntities(){
     rapid: false,
     rapidEnd: 0,
     invincible: false,
-  invincibleEnd: 0
+
+  invincibleEnd: 0,
+  damageBoost: false,
+  damageBoostEnd: 0
+
   };
   bullets = [];
   enemies = [];
@@ -107,7 +111,7 @@ function spawnEnemy(){
 }
 
 function spawnPowerup(){
-  const types = ['life','rapid'];
+  const types = ['life','rapid','damage'];
   const t = types[Math.floor(Math.random()*types.length)];
   const size = 22;
   const x = Math.random()*(W - size);
@@ -141,7 +145,7 @@ function spawnBoss(){
 function shoot(){
   const bx = player.x + player.w/2 - 4;
   const by = player.y - 12;
-  bullets.push({ x: bx, y: by, w: 8, h: 12, speed: -6, damage: player.rapid ? 2 : 1 });
+  bullets.push({ x: bx, y: by, w: 8, h: 12, speed: -6, damage: player.damageBoost ? 2 : 1 });
   playSound(sShoot, 0.9);
 }
 
@@ -215,7 +219,7 @@ function update(dt){
         bullets.splice(bi,1);
         if(e.type === 'tough'){
           if(!e.hp) e.hp = 2;
-          e.hp--;
+          e.hp -= b.damage;
           if(e.hp <= 0){
             enemies.splice(ei,1);
             kills++;
@@ -246,7 +250,7 @@ function update(dt){
          b.y < boss.y + boss.size &&
          b.y + b.h > boss.y){
         bullets.splice(bi,1);
-        boss.hp--;
+        boss.hp -= b.damage;
         playSound(sExplosion, 0.9);
        if(boss.hp <= 0){
   boss = null;
@@ -277,26 +281,43 @@ function update(dt){
   }
 
   // powerups vs player
-  for(let i = powerups.length -1; i >= 0; i--){
-    const p = powerups[i];
-    if(rectsCollide(p, player)){
-      if(p.type === 'life'){
-        lives = Math.min(5, lives+1);
-        score += 80;
-        playSound(sExplosion, 0.7);
-      } else if(p.type === 'rapid'){
-        player.rapid = true;
-        player.rapidEnd = performance.now() + 5000;
-        score += 100;
-        playSound(sExplosion, 0.7);
-      }
-      powerups.splice(i,1);
-      updateHUD();
+for(let i = powerups.length -1; i >= 0; i--){
+  const p = powerups[i];
+
+  if(rectsCollide(p, player)){
+
+    if(p.type === 'life'){
+      lives = Math.min(5, lives + 1);
+      score += 80;
+      playSound(sExplosion, 0.7);
+
+    } else if(p.type === 'rapid'){
+      player.rapid = true;
+      player.rapidEnd = performance.now() + 5000;
+      score += 100;
+      playSound(sExplosion, 0.7);
+
+    } else if(p.type === 'damage'){
+      player.damageBoost = true;
+      player.damageBoostEnd = performance.now() + 5000; // 5 segundos
+      score += 120;
+      playSound(sExplosion, 0.7);
     }
+
+    powerups.splice(i,1);
+    updateHUD();
   }
+}
+
 
   // rapid end
   if(player.rapid && performance.now() > player.rapidEnd) player.rapid = false;
+
+  // damage boost end
+  if(player.damageBoost && performance.now() > player.damageBoostEnd){
+  player.damageBoost = false;
+}
+
 
   // increase difficulty by kills
   if(kills >= level * 10){
@@ -417,12 +438,21 @@ ctx.restore();
 
   // powerups
   powerups.forEach(p=>{
-    ctx.fillStyle = (p.type==='life') ? '#6ee7b7' : '#ffd166';
+    ctx.fillStyle =
+    p.type === 'life' ? '#6ee7b7' :
+    p.type === 'rapid' ? '#ffd166' :
+    '#f72585'; // daño x2
     roundRect(ctx, p.x, p.y, p.w, p.h, 6, true, false);
     ctx.fillStyle = '#022';
     ctx.font = '12px Arial';
     ctx.textAlign = 'center';
-    ctx.fillText(p.type === 'life' ? '+' : '⚡', p.x + p.w/2, p.y + p.h/2 + 4);
+    ctx.fillText(
+     p.type === 'life' ? '+' :
+     p.type === 'rapid' ? '⚡' :
+    'x2',
+      p.x + p.w/2,
+      p.y + p.h/2 + 4
+  );
   });
 
   // boss
