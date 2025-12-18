@@ -477,6 +477,48 @@ ctx.restore();
   ctx.fillText('Score: ' + Math.floor(score), 12, 24);
   ctx.textAlign = 'right';
   ctx.fillText('Lives: ' + lives, W - 12, 24);
+  // ===== POWERUP TIMERS =====
+let barX = 12;
+let barY = 42;
+let barW = 120;
+let barH = 10;
+
+// RAPID FIRE TIMER
+if(player.rapid){
+  const timeLeft = Math.max(0, player.rapidEnd - performance.now());
+  const ratio = timeLeft / 5000;
+
+  ctx.fillStyle = 'rgba(255,209,102,0.3)';
+  ctx.fillRect(barX, barY, barW, barH);
+
+  ctx.fillStyle = '#ffd166';
+  ctx.fillRect(barX, barY, barW * ratio, barH);
+
+  ctx.fillStyle = '#fff';
+  ctx.font = '12px Arial';
+  ctx.textAlign = 'left';
+  ctx.fillText('⚡ Rapid', barX, barY - 2);
+
+  barY += 18;
+}
+
+// DAMAGE BOOST TIMER
+if(player.damageBoost){
+  const timeLeft = Math.max(0, player.damageBoostEnd - performance.now());
+  const ratio = timeLeft / 5000;
+
+  ctx.fillStyle = 'rgba(247,37,133,0.3)';
+  ctx.fillRect(barX, barY, barW, barH);
+
+  ctx.fillStyle = '#f72585';
+  ctx.fillRect(barX, barY, barW * ratio, barH);
+
+  ctx.fillStyle = '#fff';
+  ctx.font = '12px Arial';
+  ctx.textAlign = 'left';
+  ctx.fillText('x2 Damage', barX, barY - 2);
+}
+
 
   // menu overlay
   if(state === 'menu'){
