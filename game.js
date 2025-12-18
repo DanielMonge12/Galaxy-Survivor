@@ -53,6 +53,11 @@ let lives = 3;
 let player, bullets, enemies, powerups, boss;
 let bossSpawnedAt = 0; // último score en que apareció o se descartó boss
 let bossBullets = [];
+// ===== DIFICULTAD PROGRESIVA DEL BOSS =====
+let bossLevel = 1;          // cuántas veces ha salido el boss
+const bossBaseHP = 18;      // vida base
+const bossHpIncrease = 10;  // vida extra por nivel
+
 let keys = {};
 let musicStarted = false;
 
@@ -66,7 +71,13 @@ function initEntities(){
     speed: 5,
     color: '#f07b4cff',
     rapid: false,
-    rapidEnd: 0
+    rapidEnd: 0,
+    invincible: false,
+
+  invincibleEnd: 0,
+  damageBoost: false,
+  damageBoostEnd: 0
+
   };
   bullets = [];
   enemies = [];
@@ -100,7 +111,7 @@ function spawnEnemy(){
 }
 
 function spawnPowerup(){
-  const types = ['life','rapid'];
+  const types = ['life','rapid','damage'];
   const t = types[Math.floor(Math.random()*types.length)];
   const size = 22;
   const x = Math.random()*(W - size);
@@ -108,17 +119,33 @@ function spawnPowerup(){
 }
 
 function spawnBoss(){
-  // boss aparece con menos vida (ajustado), se inicializa shoot timer
   bossSpawnedAt = Math.floor(score);
-  boss = { x: W/2 - 60, y: -140, size: 110, speed: 1.2, hp: 18, dir: 1, shootTimer: 0, shootInterval: 900 };
+
+  boss = {
+    x: W/2 - 60,
+    y: -140,
+    size: 110,
+    speed: 1.2,
+    dir: 1,
+
+    // 👇 VIDA PROGRESIVA
+    hp: bossBaseHP + (bossLevel - 1) * bossHpIncrease,
+
+    shootTimer: 0,
+
+    // 👇 DISPARA MÁS RÁPIDO CADA VEZ
+    shootInterval: Math.max(400, 900 - bossLevel * 80)
+  };
+
   bossBullets = [];
 }
+
 
 // SONIDO AL DISPARAR LA NAVESITA att isma
 function shoot(){
   const bx = player.x + player.w/2 - 4;
   const by = player.y - 12;
-  bullets.push({ x: bx, y: by, w: 8, h: 12, speed: -6, damage: player.rapid ? 2 : 1 });
+  bullets.push({ x: bx, y: by, w: 8, h: 12, speed: -6, damage: player.damageBoost ? 2 : 1 });
   playSound(sShoot, 0.9);
 }
 
@@ -192,7 +219,7 @@ function update(dt){
         bullets.splice(bi,1);
         if(e.type === 'tough'){
           if(!e.hp) e.hp = 2;
-          e.hp--;
+          e.hp -= b.damage;
           if(e.hp <= 0){
             enemies.splice(ei,1);
             kills++;
@@ -223,20 +250,23 @@ function update(dt){
          b.y < boss.y + boss.size &&
          b.y + b.h > boss.y){
         bullets.splice(bi,1);
-        boss.hp--;
+        boss.hp -= b.damage;
         playSound(sExplosion, 0.9);
-        if(boss.hp <= 0){
-          // boss defeated
-          boss = null;
-          bossSpawnedAt = Math.floor(score);
-          score += 500;
-        }
+       if(boss.hp <= 0){
+  boss = null;
+  bossSpawnedAt = Math.floor(score);
+  score += 500;
+
+  // dificultad progresiva
+  bossLevel++;
+}
+
         break;
       }
     }
   }
 
-  // enemies vs player
+  // eenemigos vs jugadores
   for(let i = enemies.length -1; i >= 0; i--){
     const e = enemies[i];
     if(rectsCollide(e, player)){
@@ -251,26 +281,43 @@ function update(dt){
   }
 
   // powerups vs player
-  for(let i = powerups.length -1; i >= 0; i--){
-    const p = powerups[i];
-    if(rectsCollide(p, player)){
-      if(p.type === 'life'){
-        lives = Math.min(5, lives+1);
-        score += 80;
-        playSound(sExplosion, 0.7);
-      } else if(p.type === 'rapid'){
-        player.rapid = true;
-        player.rapidEnd = performance.now() + 5000;
-        score += 100;
-        playSound(sExplosion, 0.7);
-      }
-      powerups.splice(i,1);
-      updateHUD();
+for(let i = powerups.length -1; i >= 0; i--){
+  const p = powerups[i];
+
+  if(rectsCollide(p, player)){
+
+    if(p.type === 'life'){
+      lives = Math.min(5, lives + 1);
+      score += 80;
+      playSound(sExplosion, 0.7);
+
+    } else if(p.type === 'rapid'){
+      player.rapid = true;
+      player.rapidEnd = performance.now() + 5000;
+      score += 100;
+      playSound(sExplosion, 0.7);
+
+    } else if(p.type === 'damage'){
+      player.damageBoost = true;
+      player.damageBoostEnd = performance.now() + 5000; // 5 segundos
+      score += 120;
+      playSound(sExplosion, 0.7);
     }
+
+    powerups.splice(i,1);
+    updateHUD();
   }
+}
+
 
   // rapid end
   if(player.rapid && performance.now() > player.rapidEnd) player.rapid = false;
+
+  // damage boost end
+  if(player.damageBoost && performance.now() > player.damageBoostEnd){
+  player.damageBoost = false;
+}
+
 
   // increase difficulty by kills
   if(kills >= level * 10){
@@ -391,12 +438,21 @@ ctx.restore();
 
   // powerups
   powerups.forEach(p=>{
-    ctx.fillStyle = (p.type==='life') ? '#6ee7b7' : '#ffd166';
+    ctx.fillStyle =
+    p.type === 'life' ? '#6ee7b7' :
+    p.type === 'rapid' ? '#ffd166' :
+    '#f72585'; // daño x2
     roundRect(ctx, p.x, p.y, p.w, p.h, 6, true, false);
     ctx.fillStyle = '#022';
     ctx.font = '12px Arial';
     ctx.textAlign = 'center';
-    ctx.fillText(p.type === 'life' ? '+' : '⚡', p.x + p.w/2, p.y + p.h/2 + 4);
+    ctx.fillText(
+     p.type === 'life' ? '+' :
+     p.type === 'rapid' ? '⚡' :
+    'x2',
+      p.x + p.w/2,
+      p.y + p.h/2 + 4
+  );
   });
 
   // boss
@@ -421,6 +477,48 @@ ctx.restore();
   ctx.fillText('Score: ' + Math.floor(score), 12, 24);
   ctx.textAlign = 'right';
   ctx.fillText('Lives: ' + lives, W - 12, 24);
+  // ===== POWERUP TIMERS =====
+let barX = 12;
+let barY = 42;
+let barW = 120;
+let barH = 10;
+
+// RAPID FIRE TIMER
+if(player.rapid){
+  const timeLeft = Math.max(0, player.rapidEnd - performance.now());
+  const ratio = timeLeft / 5000;
+
+  ctx.fillStyle = 'rgba(255,209,102,0.3)';
+  ctx.fillRect(barX, barY, barW, barH);
+
+  ctx.fillStyle = '#ffd166';
+  ctx.fillRect(barX, barY, barW * ratio, barH);
+
+  ctx.fillStyle = '#fff';
+  ctx.font = '12px Arial';
+  ctx.textAlign = 'left';
+  ctx.fillText('⚡ Rapid', barX, barY - 2);
+
+  barY += 18;
+}
+
+// DAMAGE BOOST TIMER
+if(player.damageBoost){
+  const timeLeft = Math.max(0, player.damageBoostEnd - performance.now());
+  const ratio = timeLeft / 5000;
+
+  ctx.fillStyle = 'rgba(247,37,133,0.3)';
+  ctx.fillRect(barX, barY, barW, barH);
+
+  ctx.fillStyle = '#f72585';
+  ctx.fillRect(barX, barY, barW * ratio, barH);
+
+  ctx.fillStyle = '#fff';
+  ctx.font = '12px Arial';
+  ctx.textAlign = 'left';
+  ctx.fillText('x2 Damage', barX, barY - 2);
+}
+
 
   // menu overlay
   if(state === 'menu'){
